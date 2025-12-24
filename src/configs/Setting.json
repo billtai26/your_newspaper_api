@@ -1,0 +1,16 @@
+{
+  "mongodb": {
+    "username": "pxanhtai",
+    "password": "OyKKtXi2T2XszoEx",
+    "database": "news_website" 
+  },
+  "cloudinary": {
+    "cloud_name": "dyxvjfily",
+    "api_key": "518396999986458",
+    "api_secret": "blXKjM55zqLYiB-MJh9FvTiP9oc"
+  },
+  "jwt": {
+    "secret": "goK!pusp6ThEdURUtRenOwUhAsWUCLheBazl!uJLPlS8EbreWLdrupIwabRAsiBu",
+    "expiresIn": 3600 
+  }
+} 
