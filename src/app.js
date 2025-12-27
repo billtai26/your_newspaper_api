@@ -1,5 +1,6 @@
 // 1. Khai báo path để xử lý đường dẫn
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // 2. Định nghĩa __basedir trỏ về thư mục GỐC (lùi ra khỏi folder src)
 global.__basedir = path.join(__dirname, '..'); 

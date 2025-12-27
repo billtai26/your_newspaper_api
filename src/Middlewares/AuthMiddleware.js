@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const config = require(global.__basedir + "/src/configs/Setting.json");
+const config = require(global.__basedir + "/src/configs/config");
 
 const AuthMiddleware = {
     // 1. Kiểm tra Token có hợp lệ không (Dùng cho cả Admin và User)
