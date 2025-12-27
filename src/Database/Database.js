@@ -1,4 +1,4 @@
-var config = require(global.__basedir + "/src/configs/Setting.json");
+const config = require(global.__basedir + "/src/configs/config.js");
 const { MongoClient } = require('mongodb');
 
 class DatabaseConnection {
@@ -6,12 +6,10 @@ class DatabaseConnection {
 
     // Hàm connect() được gọi từ app.js
     static async connect() {
-        if (!this.client) {
-            this.user = config.mongodb.username; 
-            this.pass = config.mongodb.password; 
+        if (!this.client) { 
             
             // Chuỗi kết nối của bạn
-            this.url = "mongodb+srv://pxanhtai:OyKKtXi2T2XszoEx@cluster0.fzxgmoh.mongodb.net/";
+            this.url = process.env.MONGODB_URI;
             
             try {
                 this.client = new MongoClient(this.url);

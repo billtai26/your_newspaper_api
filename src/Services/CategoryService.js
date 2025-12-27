@@ -1,5 +1,5 @@
 var DatabaseConnection = require(global.__basedir + '/src/Database/Database');
-var Config = require(global.__basedir + "/src/configs/Setting.json"); 
+var Config = require(global.__basedir + "/src/configs/config");  
 var CategoryRepository = require(global.__basedir + "/src/repositories/CategoryRepository");
 
 class CategoryService {

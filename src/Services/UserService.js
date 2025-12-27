@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const DatabaseConnection = require('../Database/Database');
 const UserRepository = require('../repositories/UserRepository');
-const config = require(global.__basedir + "/src/configs/Setting.json"); // Check lại đường dẫn config
+const config = require(global.__basedir + "/src/configs/config"); // Check lại đường dẫn config
 
 class UserService {
     constructor() {

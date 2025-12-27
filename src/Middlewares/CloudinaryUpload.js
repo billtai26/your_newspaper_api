@@ -5,7 +5,7 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary'); 
 const multer = require('multer');
 
-const config = require(global.__basedir + "/src/configs/Setting.json");
+const config = require(global.__basedir + "/src/configs/config");
 
 cloudinary.config({
   cloud_name: config.cloudinary.cloud_name,
