@@ -11,6 +11,8 @@ const DatabaseConnection = require('./Database/Database'); // Require class
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const cors = require('cors');
+app.use(cors()); // Cho phép tất cả các domain truy cập (phù hợp khi đang dev)
 
 // Middleware
 app.use(express.json()); 
