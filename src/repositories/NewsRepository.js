@@ -57,6 +57,13 @@ class NewsRepository {
     async getNews(id){
         return await this.context.collection("news").findOne({"_id": new ObjectId(id) },{});
     }
+
+    async getNewsById(id) {
+        const db = await DatabaseConnection.getDb();
+        const { ObjectId } = require('mongodb');
+        // Tìm kiếm trong collection 'news' (hoặc tên collection của bạn) theo _id
+        return await db.collection("news").findOne({ _id: new ObjectId(id) });
+    }
 }
 
 module.exports = NewsRepository;

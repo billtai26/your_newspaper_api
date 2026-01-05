@@ -1,6 +1,9 @@
 var express = require("express");
 var router = express.Router();
 
+// Thêm vào src/controllers/index.js
+router.use("/news", require(__dirname + "/api/NewsPublicController"));
+
 // Sử dụng authenticatecontroller cho các tác vụ đăng nhập/đăng ký
 router.use("/authenticate", require(__dirname + "/api/authenticatecontroller"));
 
