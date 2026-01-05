@@ -96,5 +96,22 @@ class NewsService {
             this.session.endSession();
         }
     }
+
+    async getNewsById(id) {
+        try {
+            // Gọi hàm getNews đã có trong NewsRepository
+            const result = await this.newsRepository.getNews(id);
+            
+            // Vì constructor của bạn startTransaction nên phải commit/abort trước khi endSession
+            await this.session.commitTransaction(); 
+            return result;
+        } catch (error) {
+            console.error("Lỗi lấy chi tiết tin:", error);
+            await this.session.abortTransaction();
+            throw error;
+        } finally {
+            this.session.endSession();
+        }
+    }
 }
 module.exports = NewsService;
