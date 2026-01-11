@@ -4,6 +4,9 @@ var router = express.Router();
 // Thêm vào src/controllers/index.js
 router.use("/news", require(__dirname + "/api/NewsPublicController"));
 
+// Đăng ký route danh mục công khai
+router.use("/category", require(__dirname + "/api/CategoryPublicController"));
+
 // Sử dụng authenticatecontroller cho các tác vụ đăng nhập/đăng ký
 router.use("/authenticate", require(__dirname + "/api/authenticatecontroller"));
 
