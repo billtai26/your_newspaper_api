@@ -64,7 +64,8 @@ class AuthenticateController {
                     status: true, 
                     message: "Đăng nhập thành công", 
                     token: result.token, 
-                    role: result.role 
+                    role: result.role,
+                    username: result.username 
                 });
             } else {
                 return res.status(401).json({ status: false, message: "Sai tài khoản hoặc mật khẩu" });
