@@ -20,14 +20,13 @@ router.post("/insert-news", verifyToken, requireAdmin, upload.single('Image'), a
         news.Author = req.body.Author;
 
         // Logic xử lý ảnh linh hoạt:
+        // XỬ LÝ ẢNH LINH HOẠT:
         if (req.file) {
-            // Trường hợp 1: Chọn file từ máy tính (đã qua Cloudinary)
+            // TH1: Người dùng upload file từ máy tính
             news.Image = req.file.path; 
-        } else if (req.body.ImageUrl) {
-            // Trường hợp 2: Gửi link ảnh trực tiếp (tên key là ImageUrl hoặc tùy bạn đặt)
-            news.Image = req.body.ImageUrl;
         } else {
-            news.Image = ""; 
+            // TH2: Người dùng gửi link ảnh (Ưu tiên ImageUrl, sau đó đến Image trong body)
+            news.Image = req.body.ImageUrl || req.body.Image || ""; 
         }
 
         var result = await newsService.insertNews(news);
@@ -72,15 +71,16 @@ router.post("/update-news", verifyToken, requireAdmin, upload.single('Image'), a
 
         // Xử lý ảnh khi cập nhật:
         if (req.file) {
-            // Nếu có upload file mới -> lấy path mới
             news.Image = req.file.path; 
-        } else if (req.body.ImageUrl) {
-            // Nếu gửi link ảnh mới thay thế
-            news.Image = req.body.ImageUrl;
         } else {
-            // Nếu không gửi file và không gửi link, xóa thuộc tính Image 
-            // để NewsRepository sử dụng $set mà không làm mất ảnh cũ trong DB
-            delete news.Image; 
+            // Lấy link mới từ ImageUrl hoặc Image nếu có gửi lên
+            const newLink = req.body.ImageUrl || req.body.Image;
+            if (newLink) {
+                news.Image = newLink;
+            } else {
+                // Nếu không gửi gì cả, xóa thuộc tính Image để không ghi đè ảnh cũ trong DB
+                delete news.Image; 
+            }
         }
 
         await newsService.updateNews(news);
