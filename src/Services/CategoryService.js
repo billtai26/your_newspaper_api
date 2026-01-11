@@ -51,8 +51,17 @@ class CategoryService {
     }
 
     async getCategoryList(page, size) {
-        let skip = (page - 1) * size;
-        return await this.categoryRepository.getCategoryList(skip, size);
+        try {
+            let skip = (page - 1) * size;
+            var result = await this.categoryRepository.getCategoryList(skip, size);
+            await this.session.commitTransaction(); // Kết thúc transaction của constructor
+            return result;
+        } catch (error) {
+            await this.session.abortTransaction();
+            throw error;
+        } finally {
+            this.session.endSession(); // Đảm bảo luôn đóng session
+        }
     }
 }
 module.exports = CategoryService;
