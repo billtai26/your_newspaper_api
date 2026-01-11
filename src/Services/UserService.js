@@ -81,9 +81,22 @@ class UserService {
         const isMatch = await bcrypt.compare(password, user.Password);
         if (!isMatch) return null;
 
-        const payload = { userId: user._id, username: user.Username, role: user.Role };
-        const token = jwt.sign(payload, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
-        return { token, role: user.Role };
+        const payload = {
+            userId: user._id,
+            username: user.Username,
+            role: user.Role
+        };
+        const token = jwt.sign(
+            payload,
+            config.jwt.secret,
+            {
+                expiresIn: config.jwt.expiresIn
+            });
+        return {
+            token,
+            role: user.Role,
+            username: user.Username // Thêm dòng này
+        };
     }
 
     // Lấy danh sách người dùng có phân trang
