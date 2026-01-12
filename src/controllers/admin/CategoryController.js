@@ -10,10 +10,19 @@ var ObjectId = require('mongodb').ObjectId;
 router.get("/list", verifyToken, requireAdmin, async function(req, res) {
     var page = parseInt(req.query.page) || 1;
     var size = parseInt(req.query.size) || 10;
+    var search = req.query.search || ""; // Lấy từ khóa tìm kiếm từ FE
+
+    // Tạo đối tượng query để lọc dữ liệu
+    var query = {};
+    if (search) {
+        // Tìm kiếm theo trường 'Name', không phân biệt chữ hoa/thường ('i')
+        query.Name = { $regex: search, $options: 'i' }; 
+    }
+
     var service = new CategoryService();
-    // result lúc này sẽ là { data: [...], total: X }
-    var result = await service.getCategoryList(page, size, {});
-    res.json(result);
+    // Truyền query vào hàm getCategoryList đã được cập nhật trước đó
+    var list = await service.getCategoryList(page, size, query);
+    res.json(list);
 });
 
 // API: Thêm mới danh mục
