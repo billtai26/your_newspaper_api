@@ -7,37 +7,40 @@ const { verifyToken, requireAdmin } = require(global.__basedir + "/src/Middlewar
 var ObjectId = require('mongodb').ObjectId; 
 
 // API: Lấy danh sách danh mục có phân trang (Ví dụ: ?page=1&size=10)
-router.get("/list", verifyToken, async function(req, res) {
+router.get("/list", verifyToken, requireAdmin, async function(req, res) {
     var page = parseInt(req.query.page) || 1;
     var size = parseInt(req.query.size) || 10;
     var service = new CategoryService();
-    var list = await service.getCategoryList(page, size);
-    res.json(list);
+    // result lúc này sẽ là { data: [...], total: X }
+    var result = await service.getCategoryList(page, size, {});
+    res.json(result);
 });
 
 // API: Thêm mới danh mục
-router.post("/add", verifyToken, async function(req, res) {
+router.post("/add", verifyToken, requireAdmin, async function(req, res) {
     var service = new CategoryService();
     var cate = new Category();
     cate.Name = req.body.Name;
+    cate.Status = req.body.Status || 'Active'; // Nhận status từ FE, mặc định là Active
     cate.ParentId = req.body.ParentId || null;
     var result = await service.insertCategory(cate);
     res.json(result);
 });
 
 // API: Cập nhật danh mục
-router.put("/update", verifyToken, async function(req, res) {
+router.put("/update", verifyToken, requireAdmin, async function(req, res) {
     var service = new CategoryService();
     var cate = new Category();
     cate._id = req.body.Id;
     cate.Name = req.body.Name;
+    cate.Status = req.body.Status; // Cập nhật trạng thái mới
     cate.ParentId = req.body.ParentId;
     var result = await service.updateCategory(cate);
     res.json(result);
 });
 
 // API: Xóa danh mục
-router.delete("/delete", verifyToken, async function(req, res) {
+router.delete("/delete", verifyToken, requireAdmin, async function(req, res) {
     var service = new CategoryService();
     var result = await service.deleteCategory(req.query.id);
     res.json(result);

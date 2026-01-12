@@ -6,8 +6,8 @@ var CategoryService = require("../../Services/CategoryService");
 router.get("/list", async function(req, res) {
     try {
         var service = new CategoryService();
-        // Lấy trang 1, tối đa 100 danh mục để hiển thị trên menu
-        var list = await service.getCategoryList(1, 100);
+        // Chỉ lấy các danh mục có Status là 'Active'
+        var list = await service.getCategoryList(1, 100, { Status: "Active" }); 
         res.json(list);
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
