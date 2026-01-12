@@ -17,7 +17,11 @@ class CategoryRepository {
         var session = this.session;
         return await this.context.collection("category").updateOne(
             { "_id": new ObjectId(category._id) }, 
-            { $set: { Name: category.Name, ParentId: category.ParentId } }, 
+            { $set: { 
+                Name: category.Name, 
+                ParentId: category.ParentId,
+                Status: category.Status
+             } }, 
             { session }
         ); 
     }
@@ -29,9 +33,19 @@ class CategoryRepository {
     }
 
     // Lấy danh sách danh mục có phân trang
-    async getCategoryList(skip, take) {
-        const cursor = await this.context.collection("category").find({}, {}).skip(skip).limit(take);
-        return await cursor.toArray();
+    async getCategoryList(skip, take, query = {}) {
+        // 1. Đếm tổng số danh mục thỏa mãn điều kiện
+        const total = await this.context.collection("category").countDocuments(query);
+        
+        // 2. Lấy dữ liệu trang hiện tại
+        const cursor = await this.context.collection("category")
+            .find(query)
+            .skip(skip)
+            .limit(take);
+        const data = await cursor.toArray();
+
+        // TRẢ VỀ ĐỐI TƯỢNG (Thay vì mảng)
+        return { data, total };
     }
 }
 module.exports = CategoryRepository;
