@@ -19,7 +19,8 @@ const AuthMiddleware = {
             req.userData = decoded; // Lưu thông tin user vào request để dùng sau
             next();
         } catch (err) {
-            return res.status(500).json({ auth: false, message: 'Failed to authenticate token.' });
+            // Trả về 401 thay vì 500 để Frontend nhận diện đúng lỗi authentication
+            return res.status(401).json({ auth: false, message: 'Token đã hết hạn hoặc không hợp lệ.' });
         }
     },
 

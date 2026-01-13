@@ -11,8 +11,9 @@ router.get("/list", async function(req, res) {
         // Lấy tham số từ URL query
         const page = req.query.page || 1;
         const limit = req.query.limit || 10;
+        const categoryId = req.query.category;
 
-        const result = await newsService.getNewsWithPagination(page, limit);
+        const result = await newsService.getNewsWithPagination(page, limit, null, categoryId);
         
         // Trả về kết quả kèm thông tin phân trang
         res.json(result); 
