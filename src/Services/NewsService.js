@@ -63,24 +63,24 @@ class NewsService {
         return list;
     }
 
-    async getNewsWithPagination(page, limit) {
+    async getNewsWithPagination(page, limit, search, categoryId) {
+        const currentPage = parseInt(page) || 1;
+        const itemsPerPage = parseInt(limit) || 10;
+        
         try {
-            // Chuyển đổi sang kiểu số và đặt giá trị mặc định
-            const currentPage = parseInt(page) || 1;
-            const itemsPerPage = parseInt(limit) || 10;
-            
-            // Tính số bản ghi cần bỏ qua
             const skip = (currentPage - 1) * itemsPerPage;
+            const filters = { search, categoryId };
 
-            // Gọi repository để lấy dữ liệu và tổng số bản ghi
+            // Thực hiện truy vấn song song
             const [newsList, totalItems] = await Promise.all([
-                this.newsRepository.getNewsList(skip, itemsPerPage),
-                this.newsRepository.countNews()
+                this.newsRepository.getNewsList(skip, itemsPerPage, filters),
+                this.newsRepository.countNews(filters)
             ]);
 
             const totalPages = Math.ceil(totalItems / itemsPerPage);
 
             return {
+                success: true,
                 data: newsList,
                 pagination: {
                     totalItems,
@@ -90,10 +90,24 @@ class NewsService {
                 }
             };
         } catch (error) {
-            console.error("Lỗi phân trang:", error);
-            throw error;
+            console.error("Lỗi tại NewsService.getNewsWithPagination:", error);
+
+            return {
+                success: false,
+                message: "Không thể lấy danh sách bài viết. Vui lòng thử lại sau.",
+                data: [], // Trả về mảng rỗng để Frontend không bị lỗi .map()
+                pagination: {
+                    totalItems: 0,
+                    totalPages: 0,
+                    currentPage: currentPage,
+                    itemsPerPage: itemsPerPage
+                }
+            };
         } finally {
-            this.session.endSession();
+            // Đảm bảo phiên làm việc luôn được đóng dù thành công hay thất bại
+            if (this.session) {
+                this.session.endSession();
+            }
         }
     }
 

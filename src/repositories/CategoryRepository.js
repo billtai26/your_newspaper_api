@@ -34,17 +34,34 @@ class CategoryRepository {
 
     // Lấy danh sách danh mục có phân trang
     async getCategoryList(skip, take, query = {}) {
-        // 1. Đếm tổng số danh mục thỏa mãn điều kiện
+        // 1. Đếm tổng số danh mục để phân trang
         const total = await this.context.collection("category").countDocuments(query);
         
-        // 2. Lấy dữ liệu trang hiện tại
-        const cursor = await this.context.collection("category")
-            .find(query)
-            .skip(skip)
-            .limit(take);
-        const data = await cursor.toArray();
+        // 2. Sử dụng Aggregate để đếm số bài viết thuộc danh mục
+        const pipeline = [
+            { $match: query },
+            {
+                $lookup: {
+                    from: "news",           // Tên collection chứa bài viết
+                    localField: "_id",      // Trường ID của danh mục
+                    foreignField: "CategoryId", // Trường ID danh mục lưu trong bài viết
+                    as: "articles"          // Tên mảng chứa các bài viết tìm được
+                }
+            },
+            {
+                $addFields: {
+                    NewsCount: { $size: "$articles" } // Tạo trường NewsCount = độ dài mảng articles
+                }
+            },
+            {
+                $project: { articles: 0 } // Loại bỏ mảng articles để dữ liệu trả về nhẹ hơn
+            },
+            { $skip: skip },
+            { $limit: take }
+        ];
 
-        // TRẢ VỀ ĐỐI TƯỢNG (Thay vì mảng)
+        const data = await this.context.collection("category").aggregate(pipeline).toArray();
+
         return { data, total };
     }
 }

@@ -36,8 +36,10 @@ router.get("/news-list", async function(req, res) {
         // Lấy tham số từ URL query
         const page = req.query.page;
         const limit = req.query.limit;
+        var search = req.query.search || "";
+        var categoryId = req.query.categoryId || "";
 
-        const result = await newsService.getNewsWithPagination(page, limit);
+        const result = await newsService.getNewsWithPagination(page, limit, search, categoryId);
         
         // Trả về kết quả kèm thông tin phân trang
         res.json(result); 
