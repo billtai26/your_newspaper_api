@@ -12,7 +12,11 @@ class NewsRepository {
     // Thêm tin tức
     async insertNews(news) {
         var session = this.session;
-        // Sử dụng insertOne giống mẫu
+        // Tự động gán ngày tạo bài viết khi thêm mới
+        news.CreatedAt = new Date(); 
+        // Đảm bảo CategoryId là ObjectId để lookup hoạt động chính xác
+        if (news.CategoryId) news.CategoryId = new ObjectId(news.CategoryId);
+        
         return await this.context.collection("news").insertOne(news, { session });
     }
 
@@ -38,19 +42,60 @@ class NewsRepository {
     }
 
     // Lấy danh sách tin tức
-    async getNewsList(skip, take) {
-        // Sử dụng find, skip, limit giống mẫu
-        const cursor = await this.context.collection("news")
-            .find({}, {})
-            .sort({ createAt: -1 })
-            .skip(skip)
-            .limit(take);
-        return await cursor.toArray(); 
+    async getNewsList(skip, take, filters = {}) {
+        const { search, categoryId } = filters;
+        const query = {};
+
+        if (search) {
+            query.Title = { $regex: search, $options: 'i' };
+        }
+
+        if (categoryId && categoryId !== "") {
+            // SỬA TẠI ĐÂY: Tìm kiếm khớp với cả kiểu String hoặc ObjectId để tránh lỗi dữ liệu cũ/mới
+            query.CategoryId = { 
+                $in: [categoryId, new ObjectId(categoryId)] 
+            };
+        }
+
+        const pipeline = [
+            { $match: query }, // BƯỚC NÀY THỰC HIỆN VIỆC LỌC
+            {
+                $lookup: {
+                    from: "category",
+                    localField: "CategoryId",
+                    foreignField: "_id",
+                    as: "cat_info"
+                }
+            },
+            { $unwind: { path: "$cat_info", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 1, Title: 1, Author: 1, Content: 1, Image: 1,
+                    Views: 1, CreatedAt: 1, CategoryId: 1,
+                    CategoryName: "$cat_info.Name"
+                }
+            },
+            { $sort: { CreatedAt: -1 } },
+            { $skip: skip },
+            { $limit: take }
+        ];
+
+        return await this.context.collection("news").aggregate(pipeline).toArray();
     }
 
     // Đếm tổng số lượng tin tức để tính tổng số trang
-    async countNews() {
-        return await this.context.collection("news").countDocuments({});
+    async countNews(filters = {}) {
+        const { search, categoryId } = filters;
+        const query = {};
+        if (search) query.Title = { $regex: search, $options: 'i' };
+        
+        if (categoryId && categoryId !== "") {
+            query.CategoryId = { 
+                $in: [categoryId, new ObjectId(categoryId)] 
+            };
+        }
+
+        return await this.context.collection("news").countDocuments(query);
     }
     
     // Lấy chi tiết 1 tin
