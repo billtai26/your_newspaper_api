@@ -3,7 +3,8 @@ class News {
     Title;
     Content;
     Author;
-    Image;
+    Images;
+    CategoryId;
     constructor() { }
 }
 module.exports = News;
