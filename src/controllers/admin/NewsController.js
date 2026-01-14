@@ -17,9 +17,10 @@ router.post("/insert-news", verifyToken, requireAdmin, async function(req, res) 
         news.Content = req.body.Content;
         news.Author = req.body.Author;
         // THÊM DÒNG NÀY:
-        news.CategoryId = req.body.CategoryId; 
+        news.CategoryId = req.body.CategoryId;
 
-        news.Image = req.body.Image || ""; 
+        // Nhận mảng link hình ảnh từ body, nếu không có thì để mảng rỗng
+        news.Images = Array.isArray(req.body.Images) ? req.body.Images : [];
 
         var result = await newsService.insertNews(news);
         res.json({ status: true, message: "Thêm thành công", data: result });
@@ -61,8 +62,8 @@ router.post("/update-news", verifyToken, requireAdmin, async function(req, res) 
         // THÊM DÒNG NÀY:
         news.CategoryId = req.body.CategoryId; 
 
-        if (req.body.Image) {
-            news.Image = req.body.Image;
+        if (req.body.Images) {
+            news.Images = Array.isArray(req.body.Images) ? req.body.Images : [req.body.Images];
         }
         await newsService.updateNews(news);
         res.json({ status: true, message: "Cập nhật thành công" });

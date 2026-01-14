@@ -23,6 +23,10 @@ class NewsRepository {
     // Cập nhật tin tức
     async updateNews(news) {
         var session = this.session;
+
+        if (news.CategoryId) {
+        news.CategoryId = new ObjectId(news.CategoryId);
+        }
         // Sử dụng updateOne với $set và ObjectId giống mẫu
         return await this.context.collection("news").updateOne(
             { "_id": new ObjectId(news._id) },
@@ -70,8 +74,15 @@ class NewsRepository {
             { $unwind: { path: "$cat_info", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
-                    _id: 1, Title: 1, Author: 1, Content: 1, Image: 1,
-                    Views: 1, CreatedAt: 1, CategoryId: 1,
+                    _id: 1, 
+                    Title: 1, 
+                    Author: 1, 
+                    Content: 1, 
+                    Images: 1,
+                    Image: 1,
+                    Views: 1, 
+                    CreatedAt: 1, 
+                    CategoryId: 1,
                     CategoryName: "$cat_info.Name"
                 }
             },
