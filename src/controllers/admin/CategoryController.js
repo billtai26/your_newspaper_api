@@ -50,9 +50,21 @@ router.put("/update", verifyToken, requireAdmin, async function(req, res) {
 
 // API: Xóa danh mục
 router.delete("/delete", verifyToken, requireAdmin, async function(req, res) {
-    var service = new CategoryService();
-    var result = await service.deleteCategory(req.query.id);
-    res.json(result);
+    try {
+        var service = new CategoryService();
+        var result = await service.deleteCategory(req.query.id);
+        
+        if (result.status) {
+            res.json(result);
+        } else {
+            res.status(400).json({
+                status: false,
+                message: result.message
+            });
+        }
+    } catch (e) {
+        res.status(500).json({ status: false, message: e.message });
+    }
 });
 
 module.exports = router; 

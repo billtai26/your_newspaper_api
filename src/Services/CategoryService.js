@@ -1,6 +1,7 @@
 var DatabaseConnection = require(global.__basedir + '/src/Database/Database');
 var Config = require(global.__basedir + "/src/configs/config");  
 var CategoryRepository = require(global.__basedir + "/src/repositories/CategoryRepository");
+var ObjectId = require('mongodb').ObjectId;
 
 class CategoryService {
     constructor() {
@@ -39,12 +40,30 @@ class CategoryService {
 
     async deleteCategory(id) {
         try {
+            const categoryObjectId = new ObjectId(id);
+
+            const newsCount = await this.database.collection("news").countDocuments({ 
+                $or: [
+                    { CategoryId: categoryObjectId },
+                    { CategoryId: id }
+                ]
+            });
+
+            if (newsCount > 0) {
+                await this.session.abortTransaction();
+                return { 
+                    status: false, 
+                    message: `Hiện đang có ${newsCount} bài viết thuộc danh mục này. Vui lòng chuyển bài viết sang danh mục khác trước.` 
+                };
+            }
+
             await this.categoryRepository.deleteCategory(id);
             await this.session.commitTransaction();
             return { status: true };
+
         } catch (error) {
             await this.session.abortTransaction();
-            return { status: false };
+            return { status: false, message: error.message }; 
         } finally {
             this.session.endSession();
         }
